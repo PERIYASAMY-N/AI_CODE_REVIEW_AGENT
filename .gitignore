@@ -1,7 +1,28 @@
-node_modules/
+# Python
 venv/
+.venv/
 __pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Environment — NEVER commit real .env files
 .env
+backend/.env
+frontend/.env
+
+# Frontend build output
+node_modules/
 dist/
 build/
-*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# SQLite local database
+backend/*.db

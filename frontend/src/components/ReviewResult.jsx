@@ -284,12 +284,24 @@ function normalizeCode(raw) {
   return s;
 }
 
+// ─── Count non-blank lines ────────────────────────────────────────────────────
+function countLines(text) {
+  if (!text) return 0;
+  return text.split(/\r?\n/).filter(line => line.trim() !== '').length;
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 const ReviewResult = ({ result, language, score, risk, sourceCode, onOpenDiff }) => {
   if (!result) return null;
 
   const riskStyle = RISK_STYLES[risk] ?? RISK_STYLES.UNKNOWN;
   const corrected = normalizeCode(result.corrected_code);
+
+  const originalLines  = countLines(sourceCode  ?? '');
+  const correctedLines = countLines(corrected);
+
+  console.log('Original Lines:', originalLines);
+  console.log('Corrected Lines:', correctedLines);
 
   return (
     <div className="w-full pb-8 space-y-0">
@@ -349,6 +361,9 @@ const ReviewResult = ({ result, language, score, risk, sourceCode, onOpenDiff })
           <div className="flex items-center justify-between px-4 py-3 bg-blue-950/40 border-b border-blue-800/40">
             <h4 className="text-sm font-bold text-blue-400 flex items-center gap-2">
               <Code className="w-4 h-4" /> Corrected Code
+              <span className="text-xs font-normal text-blue-300/60 ml-1">
+                {originalLines} → {correctedLines} lines
+              </span>
             </h4>
             <div className="flex items-center gap-2">
               {onOpenDiff && sourceCode && (

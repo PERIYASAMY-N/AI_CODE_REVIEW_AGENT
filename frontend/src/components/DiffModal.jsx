@@ -147,14 +147,28 @@ function makeDecorations(changedLineSet, cssClass) {
   }));
 }
 
+// ─── Line counting ────────────────────────────────────────────────────────────
+// Count non-blank lines so the header shows meaningful numbers.
+// Used for both the stats bar ("7 → 12 lines") and the diff calculation.
+function countLines(text) {
+  if (!text) return 0;
+  return text.split(/\r?\n/).filter(line => line.trim() !== '').length;
+}
+
 // ─── Compute summary stats ────────────────────────────────────────────────────
 function computeStats(deletedLines, insertedLines, origLines, corrLines) {
+  const origTotal = countLines(origLines.join('\n'));
+  const corrTotal = countLines(corrLines.join('\n'));
+
+  console.log('Original Lines:', origTotal);
+  console.log('Corrected Lines:', corrTotal);
+
   return {
     removed:   deletedLines.size,
     added:     insertedLines.size,
-    unchanged: origLines.length - deletedLines.size,
-    origTotal: origLines.length,
-    corrTotal: corrLines.length,
+    unchanged: origLines.filter(l => l.trim() !== '').length - deletedLines.size,
+    origTotal,
+    corrTotal,
   };
 }
 
@@ -229,6 +243,12 @@ const DiffModal = ({ original, corrected, language, onClose }) => {
   const { deletedDecs, insertedDecs, stats } = useMemo(() => {
     const origLines = origText.split('\n');
     const corrLines = corrText.split('\n');
+
+    // Diagnostic: always log so we can see what the modal actually received
+    console.log('DiffModal origText lines (raw split):', origLines.length);
+    console.log('DiffModal corrText lines (raw split):', corrLines.length);
+    console.log('DiffModal corrText preview:', JSON.stringify(corrText.slice(0, 120)));
+
     const { deletedLines, insertedLines } = computeChangedLines(origLines, corrLines);
     return {
       deletedDecs:  makeDecorations(deletedLines,  'diff-line-removed'),
@@ -298,7 +318,7 @@ const DiffModal = ({ original, corrected, language, onClose }) => {
           <div className="h-4 w-px bg-gray-700" />
 
           <span className="text-gray-500">
-            {stats.origTotal} → {stats.corrTotal} lines
+            {stats.origTotal} → {stats.corrTotal} lines (non-blank)
           </span>
 
           <span className="ml-auto text-gray-600 italic">
