@@ -35,7 +35,7 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* Diff viewer */
+/* Legacy diff viewer (DiffViewer.jsx rows) */
 .diff-added {
   background-color: rgba(16, 185, 129, 0.15);
   border-left: 3px solid #10b981;
@@ -45,8 +45,48 @@ body {
   border-left: 3px solid #ef4444;
 }
 
+/* ── Monaco deltaDecoration classes used by DiffModal ─────────────────────────
+   These MUST be global (not scoped) so Monaco can find them.
+   Monaco stamps the class on the line's content widget wrapper.
+   Using !important is required to override Monaco's own background rules.     */
+
+/* Added / inserted line — light green, left accent bar */
+.diff-line-added {
+  background-color: rgba(16, 185, 129, 0.13) !important;
+  border-left: 3px solid #10b981 !important;
+}
+
+/* Deleted / removed line — light red, left accent bar */
+.diff-line-removed {
+  background-color: rgba(239, 68, 68, 0.13) !important;
+  border-left: 3px solid #ef4444 !important;
+}
+
+/* Blank placeholder line (opposite side of an insert/delete) */
+.diff-line-blank {
+  background-color: rgba(17, 24, 39, 0.6) !important;
+  border-left: 3px solid transparent !important;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+/* Named scrollbar utility (right panel) */
+.custom-scrollbar { scrollbar-width: thin; scrollbar-color: #4b5563 transparent; }
+.custom-scrollbar::-webkit-scrollbar { width: 5px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+/* IDE workspace — prevent body scroll when workspace is active */
+body:has(.ide-workspace) { overflow: hidden; }
+
+/* Line clamp utility */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

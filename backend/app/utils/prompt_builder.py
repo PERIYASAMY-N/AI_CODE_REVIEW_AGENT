@@ -1,52 +1,72 @@
 def build_review_messages(language: str, source_code: str) -> list[dict]:
     """
-    Build the messages array to send to the OpenRouter API for code review.
+    Build the messages array sent to the Groq API for code review.
+
+    Prompt design rules:
+    - System prompt demands raw JSON only, no markdown wrapping.
+    - corrected_code must use \\n for newlines and \\t for tabs — this is
+      the only way to produce valid JSON (a JSON string cannot contain a
+      raw unescaped newline character per the JSON spec).
+    - We tell the model explicitly to escape newlines so that json.loads()
+      can parse the response correctly every time.
     """
-    system_prompt = """You are an expert AI code reviewer and senior software engineer.
-You must analyze code professionally and return ONLY a valid JSON object matching the required structure.
-Do not wrap your response in markdown code blocks like ```json. Do not include any explanations before or after the JSON.
-Your response MUST be parseable by json.loads() directly."""
 
-    user_prompt = f"""Please perform a thorough code review of the following {language} code.
+    system_prompt = (
+        "You are an expert AI code reviewer and senior software engineer.\n"
+        "Return ONLY a valid JSON object — nothing else.\n"
+        "RULES:\n"
+        "1. No markdown fences. No ```json wrapper. No text before or after the JSON.\n"
+        "2. Your entire response must be one JSON object, parseable by json.loads().\n"
+        "3. For corrected_code: the JSON spec forbids raw newlines inside string values.\n"
+        "   You MUST encode every newline as the two-character sequence \\n\n"
+        "   and every tab as \\t — exactly as required by the JSON standard.\n"
+        "   Example of a valid corrected_code value:\n"
+        '   "corrected_code": "class Foo {\\n    void bar() {\\n        // fix\\n    }\\n}"\n'
+        "4. Do NOT write actual line breaks inside any JSON string value.\n"
+        "5. Preserve full indentation using \\t or spaces encoded as \\n + spaces."
+    )
 
-Analyze the code for:
-1. Bugs (logical errors, syntax errors)
-2. Security Issues (vulnerabilities, hardcoded secrets, injection risks)
-3. Best Practices (clean code principles, formatting, naming conventions)
-4. Optimizations (performance, memory usage, algorithmic efficiency)
-5. Root Cause Analysis (reasons behind critical issues, if any)
-6. Corrected Code (the full revised and improved version of the code)
-7. Code Quality, Security, and Maintainability Scores (0-100)
-8. Code Complexity Analysis (Low, Medium, High)
-9. Estimated Time Complexity (e.g., O(n), O(n^2), O(1))
-
-Provide an overall summary of your review.
-Assign an overall score, security score, and maintainability score from 0 to 100.
-Determine the risk level (choose exactly one: LOW, MEDIUM, HIGH, CRITICAL).
-
-Your response must exactly match this JSON structure:
-{{
-  "bugs": ["description of bug 1", "description of bug 2"],
-  "security_issues": ["description of issue 1"],
-  "best_practices": ["recommendation 1"],
-  "optimizations": ["optimization suggestion 1"],
-  "root_cause": ["root cause analysis statement"],
-  "corrected_code": "entire corrected source code as a single string",
-  "summary": "overall review summary",
-  "overall_score": 85,
-  "security_score": 90,
-  "maintainability_score": 88,
-  "complexity": "Medium",
-  "estimated_time_complexity": "O(n)",
-  "risk_level": "LOW"
-}}
-
-Here is the source code:
-```{language}
-{source_code}
-```"""
+    user_prompt = (
+        f"Please perform a thorough code review of the following {language} code.\n\n"
+        "Analyze for:\n"
+        "1. Bugs (logical errors, null checks, edge cases)\n"
+        "2. Security Issues (injections, hardcoded secrets, unvalidated input)\n"
+        "3. Best Practices (naming, clean code, SOLID principles)\n"
+        "4. Optimizations (algorithmic complexity, memory usage)\n"
+        "5. Root Cause Analysis of critical issues\n"
+        "6. Full Corrected Code — complete improved file, all lines\n"
+        "7. Scores: overall (0-100), security (0-100), maintainability (0-100)\n"
+        "8. Complexity: Low / Medium / High\n"
+        "9. Time Complexity: e.g. O(n), O(n²), O(1)\n\n"
+        "Return EXACTLY this JSON structure:\n"
+        "{{\n"
+        '  "bugs": ["description 1"],\n'
+        '  "security_issues": ["issue 1"],\n'
+        '  "best_practices": ["recommendation 1"],\n'
+        '  "optimizations": ["suggestion 1"],\n'
+        '  "root_cause": ["root cause 1"],\n'
+        '  "corrected_code": "full corrected code with \\\\n for newlines and \\\\t for tabs",\n'
+        '  "summary": "overall review summary",\n'
+        '  "overall_score": 85,\n'
+        '  "security_score": 90,\n'
+        '  "maintainability_score": 88,\n'
+        '  "complexity": "Medium",\n'
+        '  "estimated_time_complexity": "O(n)",\n'
+        '  "risk_level": "LOW"\n'
+        "}}\n\n"
+        "IMPORTANT for corrected_code:\n"
+        "- Include the COMPLETE file — every line, not just changed parts.\n"
+        "- Use \\n between every line of code.\n"
+        "- Use spaces or \\t for indentation.\n"
+        "- Preserve blank lines between methods as \\n\\n.\n"
+        "- Preserve all comments.\n\n"
+        f"Source code to review:\n"
+        f"```{language}\n"
+        f"{source_code}\n"
+        f"```"
+    )
 
     return [
         {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt}
+        {"role": "user",   "content": user_prompt},
     ]

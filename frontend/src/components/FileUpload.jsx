@@ -49,12 +49,13 @@ const FileUpload = ({ onFileContent, languageMap }) => {
         onChange={handleFileChange}
         className="hidden" 
       />
-      <button 
-        onClick={() => fileInputRef.current.click()} 
-        className="flex items-center px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 border border-gray-600 rounded-lg transition text-sm font-medium shadow-sm"
+      <button
+        onClick={() => fileInputRef.current.click()}
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700 hover:border-gray-500 rounded-md transition text-xs font-medium"
+        title="Upload a source file"
       >
-        <Upload className="w-4 h-4 mr-2" />
-        Upload File
+        <Upload className="w-3.5 h-3.5" />
+        Upload
       </button>
     </>
   );

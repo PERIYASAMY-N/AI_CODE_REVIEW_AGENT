@@ -19,21 +19,50 @@ const App = () => {
     <Router>
       <ThemeProvider>
         <AuthProvider>
-          <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+          {/* Full-screen shell — no max-width, no padding at this level */}
+          <div
+            className="flex flex-col min-h-screen w-full overflow-hidden transition-colors duration-300"
+            style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+          >
             <Navbar />
-            <div className="container mx-auto px-4 pb-12 max-w-7xl">
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
 
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                <Route path="/history"   element={<ProtectedRoute><ReviewHistory /></ProtectedRoute>} />
-                <Route path="/history/:id" element={<ProtectedRoute><ReviewDetails /></ProtectedRoute>} />
-                <Route path="/profile"   element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                <Route path="/admin"     element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-              </Routes>
-            </div>
+            {/* Routes that need the IDE full-bleed layout (Dashboard) get no wrapper.
+                All other routes keep their comfortable centered container. */}
+            <Routes>
+              <Route path="/" element={
+                <div className="container mx-auto px-4 pb-12 max-w-7xl">
+                  <Landing />
+                </div>
+              } />
+              <Route path="/login"    element={<div className="container mx-auto px-4 pb-12 max-w-7xl"><Login /></div>} />
+              <Route path="/register" element={<div className="container mx-auto px-4 pb-12 max-w-7xl"><Register /></div>} />
+
+              {/* Dashboard — full-bleed, no container wrapper */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute><Dashboard /></ProtectedRoute>
+              } />
+
+              <Route path="/history" element={
+                <ProtectedRoute>
+                  <div className="container mx-auto px-4 pb-12 max-w-7xl"><ReviewHistory /></div>
+                </ProtectedRoute>
+              } />
+              <Route path="/history/:id" element={
+                <ProtectedRoute>
+                  <div className="container mx-auto px-4 pb-12 max-w-7xl"><ReviewDetails /></div>
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <div className="container mx-auto px-4 pb-12 max-w-7xl"><Profile /></div>
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute>
+                  <div className="container mx-auto px-4 pb-12 max-w-7xl"><AdminDashboard /></div>
+                </ProtectedRoute>
+              } />
+            </Routes>
           </div>
         </AuthProvider>
       </ThemeProvider>
