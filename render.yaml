@@ -29,7 +29,7 @@ services:
     name: ai-code-review-frontend
     env: static
     rootDir: frontend
-    buildCommand: "npm ci && npm run build"
+    buildCommand: "npm install && node node_modules/vite/bin/vite.js build"
     staticPublishPath: dist
     headers:
       - path: /*
