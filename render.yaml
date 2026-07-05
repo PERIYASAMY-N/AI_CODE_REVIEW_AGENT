@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: ai-code-review-backend
+    env: python
+    rootDir: backend
+    buildCommand: "pip install -r requirements.txt && alembic upgrade head"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ai-code-review-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: "HS256"
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: AI_MODEL
+        value: "deepseek/deepseek-chat-v3-0324"
+      - key: FRONTEND_URL
+        sync: false
+
+databases:
+  - name: ai-code-review-db
+    databaseName: aidev
+    user: aidev
+    plan: free

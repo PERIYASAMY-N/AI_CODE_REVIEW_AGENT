@@ -1,0 +1,9 @@
+{
+  "python.defaultInterpreterPath": "d:\\CODE_REVIEW_AGENT\\backend\\venv\\Scripts\\python.exe",
+  "python.analysis.extraPaths": [
+    "./backend"
+  ],
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false
+}

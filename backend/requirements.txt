@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+python-jose[cryptography]
+bcrypt>=4.0.0
+pydantic
+pydantic-settings
+python-multipart
+pytest
+httpx
+groq
+slowapi
+fpdf2
+email-validator
