@@ -1,6 +1,19 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1';
+// VITE_API_URL must be set in the Render dashboard (Environment tab).
+// It is baked into the build at compile time by Vite.
+// For local dev it is read from frontend/.env (which is gitignored).
+//
+// If neither is set, the app logs a clear warning so it is easy to diagnose.
+const API_URL = import.meta.env.VITE_API_URL;
+
+if (!API_URL) {
+  console.error(
+    '[api.js] VITE_API_URL is not set. ' +
+    'For local dev: add it to frontend/.env. ' +
+    'For Render: set it in the dashboard → Environment tab.'
+  );
+}
 
 const api = axios.create({
   baseURL: API_URL,

@@ -6,8 +6,9 @@ __pycache__/
 *.pyo
 .pytest_cache/
 
-# Environment — NEVER commit real .env files
+# Environment files — NEVER commit, set via Render dashboard in production
 .env
+**/.env
 backend/.env
 frontend/.env
 
@@ -24,5 +25,5 @@ build/
 .DS_Store
 Thumbs.db
 
-# SQLite local database
+# SQLite local dev database
 backend/*.db
