@@ -51,12 +51,17 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 # CORS Configuration
-origins = list(set([
+# Build the allowed origins list — filter out empty/None values
+_raw_origins = [
     "http://localhost:5173",
     "http://localhost:3000",
     "http://localhost:80",
+    "http://localhost",
     settings.FRONTEND_URL,
-]))
+]
+origins = list(set(o.rstrip("/") for o in _raw_origins if o and o.strip()))
+
+logger.info(f"CORS allowed origins: {origins}")
 
 app.add_middleware(
     CORSMiddleware,
