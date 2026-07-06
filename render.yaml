@@ -22,7 +22,7 @@ services:
       - key: AI_MODEL
         value: "llama-3.3-70b-versatile"
       - key: FRONTEND_URL
-        sync: false                  # Set to your frontend URL after deploy
+        value: "https://ai-code-review-agent-1-lrnm.onrender.com"
 
   # ── Frontend (React/Vite → static site) ─────────────────────────────────────
   - type: web
@@ -41,7 +41,7 @@ services:
         destination: /index.html      # React Router SPA fallback
     envVars:
       - key: VITE_API_URL
-        sync: false                   # Set to your backend URL after deploy
+        value: "https://ai-code-review-agent-lnxj.onrender.com/api/v1"
 
 # ── PostgreSQL database ──────────────────────────────────────────────────────
 databases:

@@ -50,18 +50,13 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "An unexpected server error occurred. Please try again later."},
     )
 
-# CORS Configuration
-# Build the allowed origins list — filter out empty/None values
-_raw_origins = [
+# CORS — allow local dev origins + the deployed Render frontend
+origins = list(set(filter(None, [
     "http://localhost:5173",
     "http://localhost:3000",
-    "http://localhost:80",
-    "http://localhost",
-    settings.FRONTEND_URL,
-]
-origins = list(set(o.rstrip("/") for o in _raw_origins if o and o.strip()))
-
-logger.info(f"CORS allowed origins: {origins}")
+    "https://ai-code-review-agent-1-lrnm.onrender.com",  # production frontend
+    settings.FRONTEND_URL,   # override via env var if needed
+])))
 
 app.add_middleware(
     CORSMiddleware,
