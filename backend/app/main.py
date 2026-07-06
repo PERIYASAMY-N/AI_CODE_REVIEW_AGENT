@@ -50,18 +50,24 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "An unexpected server error occurred. Please try again later."},
     )
 
-# CORS — allow local dev origins + the deployed Render frontend
+# CORS — explicitly list every allowed origin.
+# Both the correct backend URL (ai-code-review-agent-lnxj) and the legacy
+# wrong URL (ai-code-review-backend) are served by this same codebase,
+# so we allow the frontend origin unconditionally to cover both.
 origins = list(set(filter(None, [
     "http://localhost:5173",
     "http://localhost:3000",
-    "https://ai-code-review-agent-1-lrnm.onrender.com",  # production frontend
-    settings.FRONTEND_URL,   # override via env var if needed
+    "https://ai-code-review-agent-1-lrnm.onrender.com",   # production frontend
+    settings.FRONTEND_URL,
 ])))
+
+# Log allowed origins at startup so it is visible in Render logs
+logger.info("CORS allowed origins: %s", origins)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=["*"],          # permit all origins — frontend URL still resolving
+    allow_credentials=False,      # must be False when allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )

@@ -6,11 +6,12 @@ __pycache__/
 *.pyo
 .pytest_cache/
 
-# Environment files — NEVER commit, set via Render dashboard in production
+# Environment files — NEVER commit real .env files, set via Render dashboard in production
 .env
 **/.env
 backend/.env
 frontend/.env
+# .env.production is safe to commit — contains only public URLs, no secrets
 
 # Frontend build output
 node_modules/
